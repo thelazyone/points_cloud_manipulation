@@ -26,7 +26,7 @@ use kiss3d::nalgebra::{Point2, Point3};
 // like other examples.
 
 struct AppState {
-    point_cloud_renderer: point_cloud_renderer::point_cloud_renderer,
+    point_cloud_renderer: point_cloud_renderer::PointCloudRenderer,
 }
 
 impl State for AppState {
@@ -61,7 +61,7 @@ impl State for AppState {
 fn main() {
     let window = Window::new("Points cloud visualization");
     let mut app = AppState {
-        point_cloud_renderer: point_cloud_renderer::point_cloud_renderer::new(4.0),
+        point_cloud_renderer: point_cloud_renderer::PointCloudRenderer::new(4.0),
     };
 
     // Adding the points to the renderer:
