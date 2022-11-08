@@ -1,46 +1,79 @@
-extern crate kiss3d;
-//extern crate kiss3d::nalgebra as na;
+// Starting from the code found in https://github.com/sebcrozet/kiss3d/blob/master/examples/persistent_point_cloud.rs
 
-use kiss3d::light::Light;
-use kiss3d::scene::SceneNode;
-use kiss3d::window::{State, Window};
-use kiss3d::nalgebra::{UnitQuaternion, Vector3, Translation3};
+extern crate kiss3d;
+extern crate rand;
+use rand::Rng;
 
 mod utils;
 use utils::general_utils::fill_space_cube;
-use utils::mesh_utils::append_cloud_to_node;
+use utils::point_cloud_renderer;
+use utils::general_utils;
+use utils::mesh_utils;
+
+use kiss3d::camera::Camera;
+use kiss3d::context::Context;
+use kiss3d::planar_camera::PlanarCamera;
+use kiss3d::post_processing::PostProcessingEffect;
+use kiss3d::renderer::Renderer;
+use kiss3d::resource::{
+    AllocationType, BufferType, Effect, GPUVec, ShaderAttribute, ShaderUniform,
+};
+use kiss3d::text::Font;
+use kiss3d::window::{State, Window};
+use kiss3d::nalgebra::{Matrix4, Point2, Point3, Vector3};
 
 
+// Custom renderers are used to allow rendering objects that are not necessarily
+// represented as meshes. In this example, we will render a large, growing, point cloud
+// with a color associated to each point.
+
+// Writing a custom renderer requires the main loop to be
+// handled by the `State` trait instead of a `while window.render()`
+// like other examples.
 
 struct AppState {
-    c: SceneNode,
-    rot: UnitQuaternion<f32>,
+    point_cloud_renderer: point_cloud_renderer::point_cloud_renderer,
 }
 
 impl State for AppState {
-    fn step(&mut self, _: &mut Window) {
-        self.c.prepend_to_local_rotation(&self.rot)
+    // Return the custom renderer that will be called at each
+    // render loop.
+    fn cameras_and_effect_and_renderer(
+        &mut self,
+    ) -> (
+        Option<&mut dyn Camera>,
+        Option<&mut dyn PlanarCamera>,
+        Option<&mut dyn Renderer>,
+        Option<&mut dyn PostProcessingEffect>,
+    ) {
+        (None, None, Some(&mut self.point_cloud_renderer), None)
+    }
+
+    fn step(&mut self, window: &mut Window) {
+        let num_points_text = format!(
+            "Number of points: {}",
+            self.point_cloud_renderer.num_points()
+        );
+        window.draw_text(
+            &num_points_text,
+            &Point2::new(0.0, 20.0),
+            60.0,
+            &Font::default(),
+            &Point3::new(1.0, 1.0, 1.0),
+        );
     }
 }
 
 fn main() {
-    let mut window = Window::new("Kiss3d: wasm example");
-    let mut c = window
-        .add_cube(0.2, 0.01, 0.2);
+    let window = Window::new("Points cloud visualization");
+    let mut app = AppState {
+        point_cloud_renderer: point_cloud_renderer::point_cloud_renderer::new(4.0),
+    };
 
-    c.append_translation(&Translation3::new(0.0, -0.01, -0.0));
-    c.set_color(1.0, 0.0, 0.0);
+    // Adding the points to the renderer:
+    let point_cloud = fill_space_cube(0.5, 0.0025);
+    mesh_utils::append_cloud_to_renderer(point_cloud, &mut app.point_cloud_renderer);
 
-
-    let points_cloud = fill_space_cube(0.2, 0.01);
-    append_cloud_to_node(points_cloud, &mut c);
-
-    // c.add_cube(0.05, 0.05, 0.05).append_translation(&Translation3::new(0.0, -0.05, -0.2));
-
-    window.set_light(Light::StickToCamera);
-
-    let rot = UnitQuaternion::from_axis_angle(&Vector3::y_axis(), 0.014);
-    let state = AppState { c, rot };
-
-    window.render_loop(state)
+    window.render_loop(app)
 }
+
