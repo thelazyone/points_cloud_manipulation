@@ -2,25 +2,19 @@
 
 extern crate kiss3d;
 extern crate rand;
-use rand::Rng;
 
 mod utils;
 use utils::general_utils::fill_space_cube;
 use utils::point_cloud_renderer;
-use utils::general_utils;
 use utils::mesh_utils;
 
 use kiss3d::camera::Camera;
-use kiss3d::context::Context;
 use kiss3d::planar_camera::PlanarCamera;
 use kiss3d::post_processing::PostProcessingEffect;
 use kiss3d::renderer::Renderer;
-use kiss3d::resource::{
-    AllocationType, BufferType, Effect, GPUVec, ShaderAttribute, ShaderUniform,
-};
 use kiss3d::text::Font;
 use kiss3d::window::{State, Window};
-use kiss3d::nalgebra::{Matrix4, Point2, Point3, Vector3};
+use kiss3d::nalgebra::{Point2, Point3};
 
 
 // Custom renderers are used to allow rendering objects that are not necessarily
