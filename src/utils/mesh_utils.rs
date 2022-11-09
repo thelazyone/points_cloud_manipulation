@@ -14,3 +14,4 @@ pub fn append_cloud_to_renderer(
 
     println!("added {} points to the node.", i_points.len());
 }
+
