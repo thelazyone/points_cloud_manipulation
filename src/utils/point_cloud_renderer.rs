@@ -13,7 +13,7 @@ use kiss3d::nalgebra::{Matrix4, Point3};
 
 
 /// Structure which manages the display of long-living points.
-pub struct PointCloudRenderer {
+pub struct PointsCloudManager {
     shader: Effect,
     pos: ShaderAttribute<Point3<f32>>,
     color: ShaderAttribute<Point3<f32>>,
@@ -23,14 +23,15 @@ pub struct PointCloudRenderer {
     point_size: f32,
 }
 
-impl PointCloudRenderer {
-    /// Creates a new points renderer.
-    pub fn new(point_size: f32) -> PointCloudRenderer {
+impl PointsCloudManager {
+    
+    /// Creation of a new manager.
+    pub fn new(point_size: f32) -> PointsCloudManager {
         let mut shader = Effect::new_from_str(VERTEX_SHADER_SRC, FRAGMENT_SHADER_SRC);
 
         shader.use_program();
 
-        PointCloudRenderer {
+        PointsCloudManager {
             colored_points: GPUVec::new(Vec::new(), BufferType::Array, AllocationType::StreamDraw),
             pos: shader.get_attrib::<Point3<f32>>("position").unwrap(),
             color: shader.get_attrib::<Point3<f32>>("color").unwrap(),
@@ -53,7 +54,7 @@ impl PointCloudRenderer {
     }
 }
 
-impl Renderer for PointCloudRenderer {
+impl Renderer for PointsCloudManager {
     /// Actually draws the points.
     fn render(&mut self, pass: usize, camera: &mut dyn Camera) {
         if self.colored_points.len() == 0 {
