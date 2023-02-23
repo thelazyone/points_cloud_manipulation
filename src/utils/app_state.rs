@@ -23,7 +23,7 @@ use crate::point_cloud_renderer as pcr;
 // like other examples.
 
 pub struct AppState {
-    pub point_cloud_renderer: pcr::PointCloudRenderer,
+    pub point_cloud_manager: pcr::PointsCloudManager,
 }
 
 impl State for AppState {
@@ -37,13 +37,13 @@ impl State for AppState {
         Option<&mut dyn Renderer>,
         Option<&mut dyn PostProcessingEffect>,
     ) {
-        (None, None, Some(&mut self.point_cloud_renderer), None)
+        (None, None, Some(&mut self.point_cloud_manager), None)
     }
 
     fn step(&mut self, window: &mut Window) {
         let num_points_text = format!(
             "Number of points: {}",
-            self.point_cloud_renderer.num_points()
+            self.point_cloud_manager.num_points()
         );
         window.draw_text(
             &num_points_text,

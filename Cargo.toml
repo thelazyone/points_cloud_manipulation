@@ -1,5 +1,5 @@
 [package]
-name = "voxel_map"
+name = "ps_manipulation"
 version = "0.1.0"
 edition = "2021"
 
