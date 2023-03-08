@@ -23,23 +23,10 @@ use crate::point_cloud_renderer as pcr;
 // like other examples.
 
 pub struct AppState {
-    pub point_cloud_manager: pcr::PointsCloudManager,
+    pub point_cloud_manager: pcr::PointsCloudRenderer,
 }
 
 impl State for AppState {
-    // Return the custom renderer that will be called at each
-    // render loop.
-    fn cameras_and_effect_and_renderer(
-        &mut self,
-    ) -> (
-        Option<&mut dyn Camera>,
-        Option<&mut dyn PlanarCamera>,
-        Option<&mut dyn Renderer>,
-        Option<&mut dyn PostProcessingEffect>,
-    ) {
-        (None, None, Some(&mut self.point_cloud_manager), None)
-    }
-
     fn step(&mut self, window: &mut Window) {
         let num_points_text = format!(
             "Number of points: {}",
@@ -52,5 +39,18 @@ impl State for AppState {
             &Font::default(),
             &Point3::new(1.0, 1.0, 1.0),
         );
+    }
+
+    // Return the custom renderer that will be called at each
+    // render loop.
+    fn cameras_and_effect_and_renderer(
+        &mut self,
+    ) -> (
+        Option<&mut dyn Camera>,
+        Option<&mut dyn PlanarCamera>,
+        Option<&mut dyn Renderer>,
+        Option<&mut dyn PostProcessingEffect>,
+    ) {
+        (None, None, Some(&mut self.point_cloud_manager), None)
     }
 }

@@ -22,6 +22,25 @@ pub fn fill_space_cube(i_cube_side : f32, i_linear_density : f32) -> Vec<(Point3
 
 
 
+// // MAYBE TBR
+// use wgpu::util::DeviceExt;
+//
+// pub fn apply_noise_shader(i_points: Vec<(Point3<f32>, Point3<f32>)>) -> Vec<(Point3<f32>, Point3<f32>)>{
+//
+//     // First implementing it without shader.
+//
+//
+//     let mut points_cloud = i_points.clone();
+//
+//     for elem in points_cloud.mut_iter(){
+//         elem.0.x
+//     }
+//     points_cloud
+// }
+
+
+
+
 #[cfg(test)]
 mod tests {
     #[test]

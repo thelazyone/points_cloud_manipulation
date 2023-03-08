@@ -3,9 +3,10 @@ use kiss3d::nalgebra::{Point3};
 use crate::point_cloud_renderer as pcr;
 
 
+
 pub fn append_cloud_to_renderer(
     i_points: Vec<(Point3<f32>, Point3<f32>)>, 
-    i_object: &mut pcr::PointsCloudManager){
+    i_object: &mut pcr::PointsCloudRenderer){
 
     for point_elem in i_points.iter() {
         i_object

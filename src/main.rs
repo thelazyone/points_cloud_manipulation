@@ -13,8 +13,12 @@ use kiss3d::window::{Window};
 fn main() {
     let window = Window::new("Points cloud visualization");
     let mut app = app_state::AppState {
-        point_cloud_manager: point_cloud_renderer::PointsCloudManager::new(4.0),
+        point_cloud_manager: point_cloud_renderer::PointsCloudRenderer::new(4.0),
     };
+
+    // Running a shader?
+
+
 
     // Adding the points to the renderer:
     let point_cloud = fill_space_cube(0.5, 0.0025);
