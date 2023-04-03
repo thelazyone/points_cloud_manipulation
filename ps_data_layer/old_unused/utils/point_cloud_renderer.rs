@@ -46,8 +46,6 @@ impl PointsCloudRenderer {
             colored_points: GPUVec::new(Vec::new(), BufferType::Array, AllocationType::StreamDraw),
             modified_points: GPUVec::new(Vec::new(), BufferType::ElementArray, AllocationType::StreamDraw),
             pos: shader.get_attrib::<Point3<f32>>("position").unwrap(),
-            //pos_after: noise.get_attrib::<Point3<f32>>("position_after").unwrap(),
-            //img_output: noise.get_attrib::<Matrix4<f32>>("img_output").unwrap(),
             color: shader.get_attrib::<Point3<f32>>("color").unwrap(),
             proj: shader.get_uniform::<Matrix4<f32>>("proj").unwrap(),
             view: shader.get_uniform::<Matrix4<f32>>("view").unwrap(),
@@ -62,12 +60,6 @@ impl PointsCloudRenderer {
             colored_points.push(point);
             colored_points.push(color);
         }
-        //
-        // if let Some(modified_points) = self.modified_points.data_mut() {
-        //     let tmp : Matrix4<f32> = (point, 1.);
-        //     modified_points.push(point, 1.);
-        //     modified_points.push(color);
-        // }
     }
 
     pub fn num_points(&self) -> usize {

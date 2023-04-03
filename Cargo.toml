@@ -1,20 +1,7 @@
-[package]
-name = "ps_manipulation"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-rand = "0.8.4"
-kiss3d = "0.35.0"
-nalgebra = "0.31.3"
-
-# For WGPU - maybe to be removed?
-winit = "0.26.0"
-wgpu = "0.15.1"
-env_logger = "0.9"
-log = "0.4"
-pollster = "0.2"
-futures-intrusive = "0.4"
-bytemuck = "1.13"
+# Here the proper projects:
+[workspace]
+members = [
+    "ps_data_layer",
+    "ps_visualizer",
+    "ps_shapes_creator",
+]
