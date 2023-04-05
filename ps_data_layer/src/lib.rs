@@ -1,5 +1,5 @@
 // Geometry
-use nalgebra::Point3;
+use kiss3d::nalgebra::Point3;
 
 // Filesystem and I/O
 use std::fs::File;
@@ -9,6 +9,9 @@ use std::io::BufReader;
 use std::io::Write;
 use std::io::BufWriter;
 
+
+// Local paths:
+const POINTS_FILE: &str = "maps/points.bin";
 
 // Points Cloud object
 #[derive(Debug)]
@@ -26,6 +29,10 @@ impl PointCloud {
         PointCloud::new(read_points_from_binary(i_path).unwrap())
     }
 
+    pub fn get_standard_file(&self) -> & 'static str {
+        POINTS_FILE
+    }
+
     pub fn read_from_file(&mut self, i_path : &Path) -> Option<usize> {
 
         if let Ok(points) = read_points_from_binary(i_path) {
@@ -36,7 +43,6 @@ impl PointCloud {
     }
     
     pub fn write_to_file(&self, i_path: &Path) -> Option<usize> {
-
         if let Ok(points) = write_points_to_binary(i_path, &self.points) {
             return Some(points)
         }
@@ -67,7 +73,22 @@ fn read_points_from_binary(file_path: &Path) -> std::io::Result<Vec<Point3<f32>>
 
 
 fn write_points_to_binary(file_path: &Path, points: &Vec<Point3<f32>>) -> std::io::Result<usize> {
-    let file = File::create(file_path)?;
+    println!("writing file {}", file_path.to_str().unwrap());
+
+    // Creating the path if necessary:
+    let prefix = file_path.parent().unwrap();
+    println!("Creating folder {}", prefix.to_str().unwrap());
+    std::fs::create_dir_all(prefix).unwrap();
+
+    // Creating the file.
+    let file = File::create(file_path);
+    if file.is_err() {
+        panic!("Cannot write file {}", file_path.as_os_str().to_str().unwrap())
+    };
+    
+    let file = file?;
+    
+    println!("file created.");
     let mut writer = BufWriter::new(file);
 
     let mut points_counter = 0;
@@ -79,7 +100,18 @@ fn write_points_to_binary(file_path: &Path, points: &Vec<Point3<f32>>) -> std::i
     }
 
     writer.flush()?;
+
+    println!("Written {} points.", points_counter);
+
     Ok(points_counter)
+}
+
+
+
+
+// Utilities Functions:
+pub fn are_paths_same (path_a: &Path, path_b: &Path) -> bool {
+    std::fs::canonicalize(path_a).unwrap() == std::fs::canonicalize(path_b).unwrap()
 }
 
 

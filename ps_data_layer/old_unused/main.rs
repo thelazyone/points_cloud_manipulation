@@ -10,6 +10,7 @@ use utils::app_state;
 
 use kiss3d::window::{Window};
 
+
 fn main() {
     let window = Window::new("Points cloud visualization");
     let mut app = app_state::AppState {

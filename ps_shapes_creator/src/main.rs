@@ -1,14 +1,14 @@
 use ps_data_layer::PointCloud;
-use nalgebra::Point3;
+use kiss3d::nalgebra::Point3;
 use std::path::Path;
 
 
-
 fn main() {
-    let point_cloud = create_cube(50, 0.01).unwrap();
-    point_cloud.write_to_file(Path::new("..\\points.bin"));
+    let point_cloud = create_cube(70, 0.01).unwrap();
+    println!("Writing a cube in {}...", point_cloud.get_standard_file());
+    point_cloud.write_to_file(Path::new(point_cloud.get_standard_file()));
+    println!("Done!");
 }
-
 
 fn create_cube (side : usize, step : f32) -> Option<PointCloud> {
     
