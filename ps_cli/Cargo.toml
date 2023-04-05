@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0", features = ["derive"] }
+clap = { version = "4.2.1", features = ["derive"] }
 ps_data_layer = { path = "../ps_data_layer" }
 kiss3d = "0.32" # to be removed!
 nalgebra = "0.32.2" # to be removed!

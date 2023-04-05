@@ -2,8 +2,6 @@ use ps_data_layer::PointCloud;
 use kiss3d::nalgebra::Point3;
 use std::path::Path;
 
-
-
 // Point clouds manipulator CLI, following the steps of the tutorial 
 // at https://rust-cli.github.io/book/tutorial/cli-args.html 
 
@@ -14,75 +12,86 @@ use clap::Subcommand;
 #[command(name = "ps_cli")]
 #[command(author = "Giacomo Pantalone")]
 #[command(version = "1.0")]
-#[command(about = "A CLI for quick point clouds manipulations", long_about = None)]
+#[command(about = "A CLI for quick point clouds manipulations")]
 struct CliArguments {
 
     #[command(subcommand)]
-    command: Option<Shapes>,
-
-    // /// Sets a custom config file
-    // #[arg(long, value_name = "SIDES")]
-    // cube_sides: Option<u32>,
+    command: Option<CliCommand>,
 }
 
-#[derive(Debug)]
-#[derive(Subcommand)]   
-enum Shapes {
-    /// does testing things
+// The commands structure: 
+#[derive(Parser, Debug)]
+enum CliCommand {
+    #[command(subcommand)]
+    Create(CreateCommand),
+
+    // Without subcommands
+    Corrode(CorrodeCommand),
+    Relax(RelaxCommand),
+}
+
+#[derive(Subcommand, Debug)]   
+enum CreateCommand {
     Cube {
-        #[arg(long)]
-        sides: u32,
-
-        #[arg(long)]
+        #[arg(long, default_value = "100")]
+        side: f32,
+    
+        #[arg(long, default_value = "0.02")]
         step: f32,
     },
-
-    Sphere {
-        #[arg(long)]
+    Circle {
+        #[arg(long, default_value = "2")]
         radius: f32,
-
-        #[arg(long)]
+    
+        #[arg(long, default_value = "0.03")]
         step: f32,
-    },
+    }
+}
+
+#[derive(Parser, Debug)]
+struct CorrodeCommand {
+    #[arg(long, default_value = "100")]
+    iterations: usize,
+}
+
+#[derive(Parser, Debug)]
+struct RelaxCommand {
+    #[arg(long, default_value = "3")]
+    iterations: usize,
 }
 
 fn main() {
+    // Parsing the command line into the structure defined above.
+    let args: CliArguments = CliArguments::parse();
 
-    // Retrieving the command line arguments
-    let args = CliArguments::parse();
-
-    // Depending on the command, matching:
-    match &args.command {
-        Some(Shapes::Cube { sides, step }) => {
-            let point_cloud = create_cube(*sides as usize, *step as f32).unwrap();
-            println!("Writing a cube in {}...", point_cloud.get_standard_file());
-            point_cloud.write_to_file(Path::new(point_cloud.get_standard_file()));
-            println!("Done!");
+    if let Some(command) = args.command {
+        match command {
+            CliCommand::Create(create_command) => match create_command {
+                CreateCommand::Cube { side, step } => create_cube(side, step),
+                CreateCommand::Circle { radius, step } => create_circle(radius, step),
+            },
+            CliCommand::Corrode(corrode_command) => corrode(corrode_command.iterations),
+            CliCommand::Relax(relax_command) => relax(relax_command.iterations),
         }
-        Some(Shapes::Sphere { radius, step }) => {
-            // Do nothing for sphere
-        }
-        None => {}
     }
 
     println!("Hello, world!");
 }
 
 
+// CREATION FUNCTIONS (to be moved elsewhere TODO)
 
-
-
-
-
-// To be moved elsewhere
-fn create_cube (side : usize, step : f32) -> Option<PointCloud> {
+// Stub function for creating a cube
+fn create_cube(side: f32, step: f32) {
+    println!("Creating a cube with side {} and step {}", side, step);
+    let side_elements = (side / step) as usize;
     
     // Adding points with a triple cycle.
-    let mut cube_vector : Vec<Point3<f32>> = Vec::with_capacity(side*side*side);
+    let mut cube_vector : Vec<Point3<f32>> = Vec::with_capacity(side_elements*side_elements*side_elements);
     let start_corner_dist = side as f32/ 2. * step;
-    for x_coord in 0..side {
-        for y_coord in 0..side {
-            for z_coord in 0..side {
+    for x_coord in 0..side_elements {
+        for y_coord in 0..side_elements {
+            for z_coord in 0..side_elements {
                 cube_vector.push(Point3::new(
                     x_coord as f32 * step - start_corner_dist, 
                     y_coord as f32 * step - start_corner_dist,
@@ -91,6 +100,27 @@ fn create_cube (side : usize, step : f32) -> Option<PointCloud> {
             }
         }
     }
+    let point_cloud = PointCloud::new(cube_vector);
+    
+    println!("Writing a cube in {}...", point_cloud.get_standard_file());
+    point_cloud.write_to_file(Path::new(point_cloud.get_standard_file()));
+    println!("Done!");
+}
 
-    Some(PointCloud::new(cube_vector))
+// Stub function for creating a circle
+fn create_circle(radius: f32, step: f32) {
+    println!("Creating a circle with radius {} and step {}", radius, step);
+    // Actual implementation of circle creation goes here
+}
+
+// Stub function for corroding the point cloud
+fn corrode(iterations: usize) {
+    println!("Corroding point cloud with {} iterations", iterations);
+    // Actual implementation of corrosion goes here
+}
+
+// Stub function for relaxing the point cloud
+fn relax(iterations: usize) {
+    println!("Relaxing point cloud with {} iterations", iterations);
+    // Actual implementation of relaxation goes here
 }
