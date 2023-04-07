@@ -6,7 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+# Useful Crates
 clap = { version = "4.2.1", features = ["derive"] }
 ps_data_layer = { path = "../ps_data_layer" }
+nalgebra = "0.32.2"
+rustyline = "8.2.0"
+
+# Crates to be removed 
 kiss3d = "0.32" # to be removed!
-nalgebra = "0.32.2" # to be removed!

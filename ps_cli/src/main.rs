@@ -7,6 +7,7 @@ use std::path::Path;
 
 use clap::Parser;
 use clap::Subcommand;
+use rustyline::{error::ReadlineError, Editor};
 
 #[derive(Parser, Debug)]
 #[command(name = "ps_cli")]
@@ -33,7 +34,7 @@ enum CliCommand {
 #[derive(Subcommand, Debug)]   
 enum CreateCommand {
     Cube {
-        #[arg(long, default_value = "100")]
+        #[arg(long, default_value = "1")]
         side: f32,
     
         #[arg(long, default_value = "0.02")]
@@ -61,21 +62,51 @@ struct RelaxCommand {
 }
 
 fn main() {
-    // Parsing the command line into the structure defined above.
-    let args: CliArguments = CliArguments::parse();
 
-    if let Some(command) = args.command {
-        match command {
-            CliCommand::Create(create_command) => match create_command {
-                CreateCommand::Cube { side, step } => create_cube(side, step),
-                CreateCommand::Circle { radius, step } => create_circle(radius, step),
-            },
-            CliCommand::Corrode(corrode_command) => corrode(corrode_command.iterations),
-            CliCommand::Relax(relax_command) => relax(relax_command.iterations),
+    let mut rl = Editor::<()>::new();
+
+    // Defining the rustyline interactive CLI 
+    loop {
+        let readline = rl.readline("ps-cli> ");
+        match readline {
+            Ok(line) => {
+                rl.add_history_entry(line.as_str());
+
+                let cli_args = format!("ps_cli {}", line);
+                let args = match CliArguments::try_parse_from(cli_args.split_whitespace()) {
+                    Ok(args) => args,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        continue;
+                    }
+                };
+
+                if let Some(command) = args.command {
+                    match command {
+                        CliCommand::Create(create_command) => match create_command {
+                            CreateCommand::Cube { side, step } => create_cube(side, step),
+                            CreateCommand::Circle { radius, step } => create_circle(radius, step),
+                        },
+                        CliCommand::Corrode(corrode_command) => corrode(corrode_command.iterations),
+                        CliCommand::Relax(relax_command) => relax(relax_command.iterations),
+                    }
+                }
+
+            }
+            Err(ReadlineError::Interrupted) => {
+                println!("CTRL-C");
+                break;
+            }
+            Err(ReadlineError::Eof) => {
+                println!("CTRL-D");
+                break;
+            }
+            Err(err) => {
+                eprintln!("Error: {:?}", err);
+                break;
+            }
         }
     }
-
-    println!("Hello, world!");
 }
 
 
