@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
+ps_data_layer = { path = "../ps_data_layer" }
+kiss3d = "0.32" # to be removed!
+nalgebra = "0.32.2" # to be removed!

@@ -1523,6 +1523,9 @@ dependencies = [
 name = "ps_mesh"
 version = "0.1.0"
 dependencies = [
+ "kiss3d",
+ "nalgebra 0.32.2",
+ "ps_data_layer",
  "rand",
 ]
 

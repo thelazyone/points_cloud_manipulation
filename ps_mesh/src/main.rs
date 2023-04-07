@@ -2,6 +2,9 @@ use std::collections::HashMap;
 use rand::Rng; // 0.8.5
 use std::collections::HashSet;
 
+// From ps_data_layer
+use ps_data_layer::PointCloud;
+
 #[derive(Clone, Debug)]
 struct Point3D {
     x: f64,

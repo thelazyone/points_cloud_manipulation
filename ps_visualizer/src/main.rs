@@ -4,11 +4,9 @@ use std::path::Path;
 use std::sync::mpsc;
 use std::time::Duration;
 
-use kiss3d::{light::Light, window};
+use kiss3d::{light::Light};
 use kiss3d::window::Window;
 use kiss3d::nalgebra::Point3;
-
-use std::env; // for debug only
 
 // Polling on the target file
 use notify::{DebouncedEvent, RecommendedWatcher, RecursiveMode, Watcher};
