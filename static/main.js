@@ -57,15 +57,18 @@ function update_point_cloud(points_data) {
         vertices[i * 3 + 2] = z;
     }
 
+    console.log('having', vertices.length, 'vertices');
+
     // Update the BufferGeometry with the new vertices
     pointCloud.geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3));
     pointCloud.geometry.attributes.position.needsUpdate = true;
 }
 
+camera.position.set(0, 0, 10);
+camera.lookAt(pointCloud.position);
+
 const animate = function () {
     requestAnimationFrame(animate);
-
-    // Add any animations or updates to the scene here
 
     renderer.render(scene, camera);
 };

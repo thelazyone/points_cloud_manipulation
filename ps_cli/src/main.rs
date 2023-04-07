@@ -1,5 +1,6 @@
 use ps_data_layer::PointCloud;
 use ps_mesh::PointsMesh;
+use ps_mesh::Point3D;
 use kiss3d::nalgebra::Point3;
 use std::path::Path;
 
@@ -15,7 +16,6 @@ use tokio::sync::Mutex;
 use serde_json::json;
 use tokio::time::{Duration, Instant, interval_at};
 use futures_util::{SinkExt};
-use tokio::task::LocalSet;
 
 
 #[derive(Parser, Debug)]
@@ -77,20 +77,22 @@ struct RelaxCommand {
 async fn main() {
     
     // shared space of point cloud
-    let point_cloud = Arc::new(Mutex::new(PointsMesh::new()));
+    let points_mesh = Arc::new(Mutex::new(PointsMesh::new()));
 
     // Start the HTTP server in a separate thread
+    let points_mesh_clone = points_mesh.clone();
     let clients = Arc::new(Mutex::new(Vec::new()));
+    std::thread::spawn(move || {
+        let rt = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
     
-    let point_cloud_clone = point_cloud.clone();
-    let clients_clone = clients.clone();
-
-    // Create a LocalSet to run the task and execute it.
-    let local_set = LocalSet::new();
-    local_set.spawn_local(async move {
-        run_server(point_cloud_clone, clients_clone).await;
+        rt.block_on(async move {
+            run_server(points_mesh_clone, clients).await;
+        });
     });
-    local_set.await;
+    //local_set.await;
 
     println!("Initializing the interactive CLI...");
     let mut rl = Editor::<()>::new();
@@ -113,10 +115,21 @@ async fn main() {
 
                 if let Some(command) = args.command {
                     match command {
-                        CliCommand::Create(create_command) => match create_command {
-                            CreateCommand::Cube { side, step } => create_cube(side, step),
-                            CreateCommand::Circle { radius, step } => create_circle(radius, step),
-                        },
+                        CliCommand::Create(create_command) => 
+                            match create_command {
+                                CreateCommand::Cube { side, step } => {
+                                    //create_cube(side, step, &mut points_mesh).await;
+                                    let mut mesh = points_mesh.lock().await;
+                                    mesh.points.clear();
+                                    for point in 0..10 {
+                                        mesh.points.push(Point3D::new(point as f64, point as f64, point as f64, 0.));
+                                    }
+                                    
+                                },
+                                CreateCommand::Circle { radius, step } => {
+                                    //create_circle(radius, step, &mut points_mesh).await,
+                                }
+                            },
                         CliCommand::Corrode(corrode_command) => corrode(corrode_command.iterations),
                         CliCommand::Relax(relax_command) => relax(relax_command.iterations),
                     }
@@ -162,8 +175,6 @@ async fn run_server(point_cloud: Arc<Mutex<PointsMesh>>, clients: Arc<Mutex<Vec<
 
 
 async fn handle_ws_connection(ws: warp::ws::WebSocket, point_cloud: Arc<Mutex<PointsMesh>>, clients: Arc<Mutex<Vec<Arc<Mutex<warp::ws::WebSocket>>>>>) {
-
-    
     // Add the WebSocket to the list of connected clients
     {
         let mut clients = clients.lock().await;
@@ -194,11 +205,12 @@ fn points_mesh_to_json(points_mesh: &PointsMesh) -> String {
     json!(points_mesh.get_points_for_display()).to_string()
 }
 
+
 // TODO TBR!
 // CREATION FUNCTIONS (to be moved in ps_mesh TODO)
 
 // Stub function for creating a cube
-fn create_cube(side: f32, step: f32) {
+async fn create_cube(side: f32, step: f32, mesh : &mut Arc<Mutex<PointsMesh>>) {
     println!("Creating a cube with side {} and step {}", side, step);
     let side_elements = (side / step) as usize;
     
@@ -217,14 +229,21 @@ fn create_cube(side: f32, step: f32) {
         }
     }
     let point_cloud = PointCloud::new(cube_vector);
+
+    // Preparing the mesh.
+    let mut mesh = mesh.lock().await;
+    mesh.points.clear();
+    for point in point_cloud.points {
+        mesh.points.push(Point3D::new(point.x as f64, point.y as f64, point.z as f64, 0.));
+    }
     
-    println!("Writing a cube in {}...", point_cloud.get_standard_file());
-    point_cloud.write_to_file(Path::new(point_cloud.get_standard_file()));
-    println!("Done!");
+    // println!("Writing a cube in {}...", point_cloud.get_standard_file());
+    // point_cloud.write_to_file(Path::new(point_cloud.get_standard_file()));
+    // println!("Done!");
 }
 
 // Stub function for creating a circle
-fn create_circle(radius: f32, step: f32) {
+async fn create_circle(radius: f32, step: f32, mesh : &mut Arc<Mutex<PointsMesh>>) {
     println!("Creating a circle with radius {} and step {}", radius, step);
     // Actual implementation of circle creation goes here
 }

@@ -6,7 +6,7 @@ use std::collections::HashSet;
 use ps_data_layer::PointCloud;
 
 #[derive(Clone, Debug)]
-struct Point3D {
+pub struct Point3D {
     x: f64,
     y: f64,
     z: f64,
@@ -16,7 +16,7 @@ struct Point3D {
 }
 
 impl Point3D {
-    fn new(x: f64, y: f64, z: f64, breaking_point: f64) -> Self {
+    pub fn new(x: f64, y: f64, z: f64, breaking_point: f64) -> Self {
         Self {
             x,
             y,
@@ -27,14 +27,14 @@ impl Point3D {
         }
     }
 
-    fn distance(&self, other: &Self) -> f64 {
+    pub fn distance(&self, other: &Self) -> f64 {
         ((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + (self.z - other.z).powi(2)).sqrt()
     }
 }
 
 pub struct PointsMesh {
-    points: Vec<Point3D>,
-    connections: HashMap<usize, Vec<usize>>,
+    pub points: Vec<Point3D>,
+    pub connections: HashMap<usize, Vec<usize>>,
 }
 
 impl PointsMesh {
