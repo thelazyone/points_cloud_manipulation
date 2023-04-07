@@ -32,20 +32,20 @@ impl Point3D {
     }
 }
 
-struct PointsMesh {
+pub struct PointsMesh {
     points: Vec<Point3D>,
     connections: HashMap<usize, Vec<usize>>,
 }
 
 impl PointsMesh {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             points: Vec::new(),
             connections: HashMap::new(),
         }
     }
 
-    fn create_points(&mut self, num_points: usize, volume: (f64, f64, f64), breaking_range: (f64, f64)) {
+    pub fn create_points(&mut self, num_points: usize, volume: (f64, f64, f64), breaking_range: (f64, f64)) {
         let mut rng = rand::thread_rng();
         self.points.clear();
 
@@ -59,7 +59,7 @@ impl PointsMesh {
         }
     }
 
-    fn establish_connections(&mut self, radius: f64) {
+    pub fn establish_connections(&mut self, radius: f64) {
         self.connections.clear();
 
         for i in 0..self.points.len() {
@@ -74,7 +74,7 @@ impl PointsMesh {
         }
     }
 
-    fn remove_unconnected_points(&mut self) {
+    pub fn remove_unconnected_points(&mut self) {
         let unconnected_points: HashSet<usize> = self.points
             .iter()
             .enumerate()
@@ -112,12 +112,12 @@ impl PointsMesh {
         self.connections = new_connections;
     }
 
-    fn average_connections_per_point(&self) -> f64 {
+    pub fn average_connections_per_point(&self) -> f64 {
         let total_connections: usize = self.connections.values().map(|v| v.len()).sum();
         total_connections as f64 / self.points.len() as f64
     }
 
-    fn statistics(&self) -> (f64, usize) {
+    pub fn get_statistics(&self) -> (f64, usize) {
         let average_connections = self.average_connections_per_point();
         let unconnected_points = self.points.len() - self.connections.len();
 
@@ -125,7 +125,7 @@ impl PointsMesh {
     }
 
     
-    fn simple_relaxation_step(&mut self, relaxation_factor: f64) {
+    pub fn relaxation_step(&mut self, relaxation_factor: f64) {
         let mut new_positions = Vec::with_capacity(self.points.len());
     
         for (index, _) in self.points.iter().enumerate() {
@@ -156,33 +156,38 @@ impl PointsMesh {
     }
 
 
-    fn point_connections(&self, index: usize) -> Option<&Vec<usize>> {
+    pub fn get_points_for_display(&self) -> Vec<Vec<f64>> {
+        self.points.iter().map(|point| vec![point.x, point.y, point.z]).collect::<Vec<_>>()
+    }
+
+
+    pub fn get_point_connections(&self, index: usize) -> Option<&Vec<usize>> {
         self.connections.get(&index)
     }
 }
 
-fn main() {
-    let num_points = 50;
-    let volume = (10.0, 10.0, 10.0);
-    let breaking_range = (30.0, 100.0);
-    let connection_radius = 5.5;
+// fn main() {
+//     let num_points = 50;
+//     let volume = (10.0, 10.0, 10.0);
+//     let breaking_range = (30.0, 100.0);
+//     let connection_radius = 5.5;
 
-    let mut points_mesh = PointsMesh::new();
-    points_mesh.create_points(num_points, volume, breaking_range);
-    points_mesh.establish_connections(connection_radius);
-    points_mesh.remove_unconnected_points();
+//     let mut points_mesh = PointsMesh::new();
+//     points_mesh.create_points(num_points, volume, breaking_range);
+//     points_mesh.establish_connections(connection_radius);
+//     points_mesh.remove_unconnected_points();
 
-    // Printing the statistics:
-    let stats = points_mesh.statistics();
-    println!("Average connections BEFORE are {}, and {} isolated points", stats.0, stats.1); 
+//     // Printing the statistics:
+//     let stats = points_mesh.statistics();
+//     println!("Average connections BEFORE are {}, and {} isolated points", stats.0, stats.1); 
 
-    points_mesh.simple_relaxation_step(0.5);
-    points_mesh.simple_relaxation_step(0.5);
-    points_mesh.simple_relaxation_step(0.5);
-    points_mesh.establish_connections(connection_radius);
-    points_mesh.remove_unconnected_points();
+//     points_mesh.simple_relaxation_step(0.5);
+//     points_mesh.simple_relaxation_step(0.5);
+//     points_mesh.simple_relaxation_step(0.5);
+//     points_mesh.establish_connections(connection_radius);
+//     points_mesh.remove_unconnected_points();
 
-    // Printing the statistics:
-    let stats = points_mesh.statistics();
-    println!("Average connections AFTER  are {}, and {} isolated points", stats.0, stats.1); 
-}
+//     // Printing the statistics:
+//     let stats = points_mesh.statistics();
+//     println!("Average connections AFTER  are {}, and {} isolated points", stats.0, stats.1); 
+// }
