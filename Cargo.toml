@@ -3,7 +3,6 @@
 members = [
     "ps_data_layer",
     "ps_visualizer",
-    "ps_shapes_creator",
     "ps_cli",
     "ps_mesh",
 ]

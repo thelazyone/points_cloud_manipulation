@@ -1,9 +1,20 @@
+// importing controls
+import * as THREE from 'three';
+import { OrbitControls } from 'OrbitControls';
+
+
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
+
+// Set up OrbitControls
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; // Enable smooth damping of the rotation
+controls.dampingFactor = 0.1; // Damping factor (between 0 and 1)
+controls.rotateSpeed = 0.5; // Rotation speed
 
 // Create an empty BufferGeometry
 const geometry = new THREE.BufferGeometry();
@@ -30,7 +41,7 @@ socket.addEventListener('open', (event) => {
 });
 
 socket.addEventListener('message', (event) => {
-    console.log('WebSocket message received:', event);
+    console.log('AA WebSocket message received:', event);
 
     // Parse the received data and update the point cloud visualization
     const points_mesh = JSON.parse(event.data);
@@ -64,11 +75,18 @@ function update_point_cloud(points_data) {
     pointCloud.geometry.attributes.position.needsUpdate = true;
 }
 
+
+
+
 camera.position.set(0, 0, 10);
 camera.lookAt(pointCloud.position);
 
+
 const animate = function () {
     requestAnimationFrame(animate);
+
+    // Update OrbitControls
+    controls.update();
 
     renderer.render(scene, camera);
 };

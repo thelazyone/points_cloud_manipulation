@@ -2011,15 +2011,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ps_shapes_creator"
-version = "0.1.0"
-dependencies = [
- "kiss3d",
- "nalgebra 0.32.2",
- "ps_data_layer",
-]
-
-[[package]]
 name = "ps_visualizer"
 version = "0.1.0"
 dependencies = [

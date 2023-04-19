@@ -1,4 +1,4 @@
-use ps_mesh::PointsMesh;
+use ps_mesh::point_mesh::PointsMesh;
 
 // For the real-time visualization  
 use std::sync::Arc;
@@ -14,7 +14,7 @@ pub async fn handle_ws_connection(ws: warp::ws::WebSocket, point_cloud: Arc<Mute
         let mut clients = clients.lock().await;
         clients.push(Arc::new(Mutex::new(ws)));
     }
-    let mut interval = interval_at(Instant::now(), Duration::from_millis(100)); // Update every 100ms, adjust as needed
+    let mut interval = interval_at(Instant::now(), Duration::from_millis(1000)); // Update every 100ms, adjust as needed
 
     loop {
         interval.tick().await;
@@ -24,7 +24,7 @@ pub async fn handle_ws_connection(ws: warp::ws::WebSocket, point_cloud: Arc<Mute
             points_mesh_to_json(&point_cloud)
         };
 
-        let mut clients = clients.lock().await;
+        let clients = clients.lock().await;
         for client in clients.iter() {
             let mut client = client.lock().await;
 
